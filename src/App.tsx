@@ -14,11 +14,13 @@ import {
     WeekView
 } from "@devexpress/dx-react-scheduler-material-ui";
 import { Paper } from "@mui/material";
-import { useState } from "react";
+import { collection, doc, getDocs, writeBatch } from "firebase/firestore/lite";
+import { useEffect, useState } from "react";
+import { db } from "./utils/firebase";
 
 export interface Appointment {
     /** The identifier. */
-    id: number;
+    id: string;
     /** The start date. */
     startDate: SchedulerDateTime;
     /** The end date. */
@@ -36,49 +38,51 @@ export interface Appointment {
 }
 
 export default function App() {
-    const [appointments, setAppointments] = useState<Appointment[]>([
-        {
-            title: "Website Re-Design Plan",
-            startDate: new Date(2018, 5, 25, 9, 35),
-            endDate: new Date(2018, 5, 25, 11, 30),
-            id: 0,
-            rRule: "FREQ=DAILY;COUNT=3",
-            exDate: "20180628T063500Z,20180626T063500Z"
-        },
-        {
-            title: "Book Flights to San Fran for Sales Trip",
-            startDate: new Date(2018, 5, 25, 12, 11),
-            endDate: new Date(2018, 5, 25, 13, 0),
-            id: 1,
-            rRule: "FREQ=DAILY;COUNT=4",
-            exDate: "20180627T091100Z"
-        },
-        {
-            title: "Install New Router in Dev Room",
-            startDate: new Date(2018, 5, 25, 13, 30),
-            endDate: new Date(2018, 5, 25, 14, 35),
-            id: 2,
-            rRule: "FREQ=DAILY;COUNT=5"
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+
+    useEffect(() => {
+        async function getAppointments() {
+            const appointmentsCol = collection(db, "appointments");
+            const querySnapshot = await getDocs(appointmentsCol);
+
+            const appointments = querySnapshot.docs.map((doc) => {
+                const data = doc.data();
+
+                return {
+                    id: doc.id as string,
+                    startDate: data.startDate?.toDate() as Date,
+                    endDate: data.endDate?.toDate() as Date,
+                    title: data.title as string
+                };
+            });
+
+            setAppointments(appointments);
         }
-    ]);
 
-    const onCommitChanges = (changes: ChangeSet) => {
-        console.log("Current Appointments: ", appointments);
-        console.log("Changes: ", changes);
-
+        getAppointments();
+    }, []);
+    const onCommitChanges = async (changes: ChangeSet) => {
         const { added, changed, deleted } = changes;
+        const batch = writeBatch(db);
 
         setAppointments((prev) => {
             const newAppointments = [...prev];
 
             if (added) {
-                const startingAddedId =
-                    newAppointments.length > 0 ? newAppointments[newAppointments.length - 1].id + 1 : 0;
+                const newAppointmentRef = doc(collection(db, "appointments"));
 
-                newAppointments.push({
-                    id: startingAddedId,
+                const newAppointment: Appointment = {
+                    id: newAppointmentRef.id,
                     startDate: added.startDate || new Date(),
                     ...added
+                };
+
+                newAppointments.push(newAppointment);
+
+                batch.set(newAppointmentRef, {
+                    startDate: newAppointment.startDate,
+                    endDate: newAppointment.endDate,
+                    title: newAppointment.title || ""
                 });
             }
 
@@ -86,16 +90,24 @@ export default function App() {
                 newAppointments.forEach((appointment) => {
                     if (changed[appointment.id]) {
                         Object.assign(appointment, changed[appointment.id]);
+
+                        const appointmentRef = doc(db, "appointments", appointment.id);
+                        batch.update(appointmentRef, changed[appointment.id]);
                     }
                 });
             }
 
             if (deleted !== undefined) {
-                newAppointments.splice(
-                    newAppointments.findIndex((appointment) => appointment.id === deleted),
-                    1
-                );
+                const index = newAppointments.findIndex((appointment) => appointment.id === deleted);
+                if (index !== -1) {
+                    newAppointments.splice(index, 1);
+
+                    const appointmentRef = doc(db, "appointments", deleted.toString());
+                    batch.delete(appointmentRef);
+                }
             }
+
+            batch.commit();
 
             return newAppointments;
         });
@@ -104,7 +116,7 @@ export default function App() {
     return (
         <Paper>
             <Scheduler height={900} data={appointments}>
-                <ViewState currentDate="2018-06-25" />
+                <ViewState />
                 <EditingState onCommitChanges={onCommitChanges} />
                 <WeekView />
                 <DayView />
