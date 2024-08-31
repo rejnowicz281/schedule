@@ -23,6 +23,7 @@ import { Paper } from "@mui/material";
 import { collection, doc, onSnapshot, query, where, writeBatch } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import CustomAppointmentForm from "./custom-appointment-form";
+import CustomAppointmentTooltipContent from "./custom-appointment-tooltip-content";
 
 export default function Calendar() {
     const { user } = useAuth();
@@ -114,7 +115,12 @@ export default function Calendar() {
                 <EditRecurrenceMenu />
                 <Appointments />
                 <DragDropProvider />
-                <AppointmentTooltip showCloseButton showOpenButton showDeleteButton />
+                <AppointmentTooltip
+                    contentComponent={CustomAppointmentTooltipContent}
+                    showCloseButton
+                    showOpenButton
+                    showDeleteButton
+                />
                 <AppointmentForm basicLayoutComponent={CustomAppointmentForm} />
             </Scheduler>
         </Paper>
