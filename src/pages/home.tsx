@@ -1,43 +1,28 @@
 import CustomAppointmentForm from "@/components/custom-appointment-form";
 import { useAuth } from "@/providers/auth-provider";
+import { Appointment } from "@/types/appointment";
 import { auth, db } from "@/utils/firebase";
-import { ChangeSet, EditingState, SchedulerDateTime, ViewState } from "@devexpress/dx-react-scheduler";
+import mapAppointment from "@/utils/mappers/appointment";
+import { ChangeSet, EditingState, ViewState } from "@devexpress/dx-react-scheduler";
 import {
     AllDayPanel,
     AppointmentForm,
     Appointments,
     AppointmentTooltip,
+    DateNavigator,
     DayView,
     DragDropProvider,
     EditRecurrenceMenu,
     MonthView,
     Scheduler,
+    TodayButton,
     Toolbar,
     ViewSwitcher,
     WeekView
 } from "@devexpress/dx-react-scheduler-material-ui";
 import { Button, Paper } from "@mui/material";
-import { collection, doc, getDocs, query, where, writeBatch } from "firebase/firestore/lite";
+import { collection, doc, onSnapshot, query, where, writeBatch } from "firebase/firestore";
 import { useEffect, useState } from "react";
-
-export interface Appointment {
-    /** The identifier. */
-    id: string;
-    /** The start date. */
-    startDate: SchedulerDateTime;
-    /** The end date. */
-    endDate?: SchedulerDateTime;
-    /** The title. */
-    title?: string;
-    /** The all day flag. */
-    allDay?: boolean;
-    /** Specifies the appointment recurrence rule. */
-    rRule?: string | undefined;
-    /** Specifies dates excluded from recurrence. */
-    exDate?: string | undefined;
-    /** Any other properties. */
-    [propertyName: string]: any;
-}
 
 export default function HomePage() {
     const { user } = useAuth();
@@ -50,24 +35,20 @@ export default function HomePage() {
         const appointmentsCol = collection(db, "appointments");
         const q = query(appointmentsCol, where("userId", "==", user.uid));
 
-        getDocs(q).then((querySnapshot) => {
-            const appointments = querySnapshot.docs.map((doc) => {
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const appointments = snapshot.docs.map((doc) => {
                 const data = doc.data();
 
-                return {
-                    ...data,
-                    id: doc.id as string,
-                    startDate: data.startDate.toDate() as Date,
-                    endDate: data.endDate?.toDate() as Date | undefined
-                };
+                return mapAppointment(data, doc.id);
             });
 
             setAppointments(appointments);
         });
+
+        return () => unsubscribe();
     }, []);
 
-    const onCommitChanges = async (changes: ChangeSet) => {
-        const { added, changed, deleted } = changes;
+    const onCommitChanges = async ({ added, changed, deleted }: ChangeSet) => {
         const batch = writeBatch(db);
 
         setAppointments((prev) => {
@@ -76,39 +57,35 @@ export default function HomePage() {
             if (added) {
                 const newAppointmentRef = doc(collection(db, "appointments"));
 
-                const newAppointment: Appointment = {
-                    id: newAppointmentRef.id,
-                    startDate: added.startDate || new Date(),
-                    ...added
-                };
+                const newAppointment = mapAppointment({ ...added, userId: user.uid }, newAppointmentRef.id);
 
                 newAppointments.push(newAppointment);
 
-                batch.set(newAppointmentRef, {
-                    startDate: newAppointment.startDate,
-                    endDate: newAppointment.endDate,
-                    title: newAppointment.title || "",
-                    userId: user.uid
-                });
+                batch.set(newAppointmentRef, newAppointment);
             }
 
             if (changed) {
                 newAppointments.forEach((appointment) => {
-                    if (changed[appointment.id]) {
-                        Object.assign(appointment, changed[appointment.id]);
+                    const appointmentChanges = changed[appointment.id];
+
+                    if (appointmentChanges) {
+                        appointment = mapAppointment({ ...appointment, ...appointmentChanges }, appointment.id);
 
                         const appointmentRef = doc(db, "appointments", appointment.id);
-                        batch.update(appointmentRef, changed[appointment.id]);
+
+                        batch.update(appointmentRef, appointment);
                     }
                 });
             }
 
             if (deleted !== undefined) {
                 const index = newAppointments.findIndex((appointment) => appointment.id === deleted);
+
                 if (index !== -1) {
                     newAppointments.splice(index, 1);
 
                     const appointmentRef = doc(db, "appointments", deleted.toString());
+
                     batch.delete(appointmentRef);
                 }
             }
@@ -131,6 +108,8 @@ export default function HomePage() {
                     <DayView />
                     <MonthView />
                     <Toolbar />
+                    <DateNavigator />
+                    <TodayButton />
                     <ViewSwitcher />
                     <AllDayPanel />
                     <EditRecurrenceMenu />

@@ -1,4 +1,8 @@
+import { BasicUser } from "@/types/user";
+import { db } from "@/utils/firebase";
 import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import SwapVert from "@mui/icons-material/SwapVert";
 import {
     Avatar,
     Dialog,
@@ -7,81 +11,117 @@ import {
     ListItem,
     ListItemAvatar,
     ListItemButton,
-    ListItemText
+    ListItemText,
+    Tooltip
 } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect, useState } from "react";
 
-export interface SimpleDialogProps {
-    open: boolean;
-    selectedValue: string;
-    onClose: (value: string) => void;
-}
-
-const emails = ["username@gmail.com", "user02@gmail.com"];
-
-export default function PinUserDialog() {
+export default function PinUserDialog({
+    pinnedUsers,
+    onPinnedUsersChange
+}: {
+    pinnedUsers: BasicUser[];
+    onPinnedUsersChange: (users: BasicUser[]) => void;
+}) {
     const [open, setOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState(emails[1]);
 
-    const handleClickOpen = () => {
+    const onOpen = () => {
         setOpen(true);
     };
 
-    const handleClose = (value: string) => {
+    const onClose = () => {
         setOpen(false);
-        setSelectedValue(value);
     };
+
+    function SimpleDialog({ onClose, open }: { open: boolean; onClose: (value: string) => void }) {
+        const [users, setUsers] = useState<BasicUser[]>([]);
+
+        useEffect(() => {
+            const usersCol = collection(db, "users");
+
+            getDocs(usersCol).then((querySnapshot) => {
+                const users = querySnapshot.docs.map((doc) => {
+                    const data = doc.data();
+
+                    return {
+                        id: doc.id,
+                        displayName: data.displayName,
+                        photoURL: data.photoURL
+                    };
+                });
+
+                setUsers(users);
+            });
+        }, []);
+
+        const isPinned = (userId: string) => {
+            return pinnedUsers.find((user) => user.id === userId);
+        };
+
+        const onListItemClick = (user: BasicUser) => {
+            const updatedPinnedUsers = isPinned(user.id)
+                ? pinnedUsers.filter((u) => u.id !== user.id)
+                : [...pinnedUsers, user];
+
+            onPinnedUsersChange(updatedPinnedUsers);
+        };
+
+        return (
+            <Dialog onClose={onClose} open={open}>
+                <DialogTitle>Pinned Users</DialogTitle>
+                <List sx={{ pt: 0 }}>
+                    {users.map((user) => (
+                        <ListItem disableGutters key={user.id}>
+                            <ListItemButton onClick={() => onListItemClick(user)}>
+                                {isPinned(user.id) ? (
+                                    <RemoveIcon sx={{ marginRight: "10px" }} color="warning" />
+                                ) : (
+                                    <AddIcon sx={{ marginRight: "10px" }} color="action" />
+                                )}
+                                <ListItemAvatar>
+                                    <Avatar src={user.photoURL}>{user.displayName[0].toUpperCase()}</Avatar>
+                                </ListItemAvatar>
+                                <ListItemText primary={user.displayName} />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+            </Dialog>
+        );
+    }
 
     return (
         <div>
-            <Typography
-                sx={{
-                    fontWeight: 700,
-                    fontSize: "19px",
-                    paddingBottom: "8px",
-                    paddingTop: "16px"
-                }}
-            >
-                Pinned Users
-            </Typography>
-            <button
-                className="bg-inherit border-blue-500 cursor-pointer w-10 h-10 rounded-full"
-                onClick={handleClickOpen}
-            >
-                <AddIcon />
-            </button>
-            <SimpleDialog selectedValue={selectedValue} open={open} onClose={handleClose} />
-        </div>
-    );
-}
-
-function SimpleDialog(props: SimpleDialogProps) {
-    const { onClose, selectedValue, open } = props;
-
-    const handleClose = () => {
-        onClose(selectedValue);
-    };
-
-    const handleListItemClick = (value: string) => {
-        onClose(value);
-    };
-
-    return (
-        <Dialog onClose={handleClose} open={open}>
-            <DialogTitle>Pin Users</DialogTitle>
-            <List sx={{ pt: 0 }}>
-                {emails.map((email) => (
-                    <ListItem disableGutters key={email}>
-                        <ListItemButton onClick={() => handleListItemClick(email)}>
-                            <ListItemAvatar>
-                                <Avatar sx={{ bgcolor: "white", color: "red" }}>{email[0].toUpperCase()}</Avatar>
-                            </ListItemAvatar>
-                            <ListItemText primary={email} />
-                        </ListItemButton>
-                    </ListItem>
+            <div className="flex gap-2 items-center">
+                <Typography
+                    sx={{
+                        fontWeight: 700,
+                        fontSize: "19px",
+                        paddingBottom: "8px",
+                        paddingTop: "16px"
+                    }}
+                >
+                    Pinned Users
+                </Typography>
+                <button
+                    className="bg-inherit flex items-center justify-center border-gray-500 border cursor-pointer w-7 h-7 rounded-full"
+                    onClick={onOpen}
+                >
+                    <SwapVert className="w-4 h-4" />
+                </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+                {pinnedUsers.map((user) => (
+                    <Tooltip arrow title={user.displayName}>
+                        <Avatar className="cursor-pointer" src={user.photoURL} key={user.id}>
+                            {user.displayName[0].toUpperCase()}
+                        </Avatar>
+                    </Tooltip>
                 ))}
-            </List>
-        </Dialog>
+            </div>
+            <SimpleDialog open={open} onClose={onClose} />
+        </div>
     );
 }
