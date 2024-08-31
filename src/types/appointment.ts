@@ -1,5 +1,5 @@
 import { SchedulerDateTime } from "@devexpress/dx-react-scheduler";
-import { BasicUser } from "./user";
+import { User } from "./user";
 
 export type Appointment = {
     /** The identifier. */
@@ -24,7 +24,7 @@ export type Appointment = {
     exDate?: string;
 
     /** The pinned users. */
-    pinnedUsers?: BasicUser[];
+    pinnedUsers?: User[];
 
     /** Any other properties. */
     [propertyName: string]: any;

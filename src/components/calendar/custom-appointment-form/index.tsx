@@ -1,19 +1,26 @@
-import { BasicUser } from "@/types/user";
+import { User } from "@/types/user";
 import { AppointmentForm } from "@devexpress/dx-react-scheduler-material-ui";
-import PinUserDialog from "./pin-user-dialog";
+import PinnedUsersSection from "./pinned-users-section";
 
 export default function CustomAppointmentForm({
     appointmentData,
     onFieldChange,
+    readOnly,
     ...restProps
 }: AppointmentForm.BasicLayoutProps) {
-    const handlePinnedUsersChange = (pinnedUsers: BasicUser[]) => {
+    const handlePinnedUsersChange = (pinnedUsers: User[]) => {
         onFieldChange({ pinnedUsers });
     };
 
     return (
-        <AppointmentForm.BasicLayout onFieldChange={onFieldChange} appointmentData={appointmentData} {...restProps}>
-            <PinUserDialog
+        <AppointmentForm.BasicLayout
+            readOnly={readOnly}
+            onFieldChange={onFieldChange}
+            appointmentData={appointmentData}
+            {...restProps}
+        >
+            <PinnedUsersSection
+                readOnly={readOnly}
                 pinnedUsers={appointmentData?.pinnedUsers || []}
                 onPinnedUsersChange={handlePinnedUsersChange}
             />
