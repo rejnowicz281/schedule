@@ -1,9 +1,9 @@
 import { auth, db, githubProvider } from "@/utils/firebase";
+import GitHubIcon from "@mui/icons-material/GitHub";
 import { Button } from "@mui/material";
 import { signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useTranslation } from "react-i18next";
-
 export default function GithubLoginButton() {
     const { t } = useTranslation();
 
@@ -27,8 +27,12 @@ export default function GithubLoginButton() {
     };
 
     return (
-        <Button variant="contained" onClick={handleGitHubLogin}>
-            {t("Login With Github")}
+        <Button
+            variant="contained"
+            sx={{ background: "#18181b", fontWeight: "bold", gap: 1, ":hover": { background: "rgb(39 39 42)" } }}
+            onClick={handleGitHubLogin}
+        >
+            <GitHubIcon /> {t("Login With Github")}
         </Button>
     );
 }
