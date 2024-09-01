@@ -57,7 +57,7 @@ i18next
                     Fourth: "Czwarty",
                     Last: "Ostatni",
                     "year(s)": "rok/lata",
-                    of: "z",
+                    of: "",
                     Every: "Co",
                     Details: "Szczegóły",
                     "Pinned Users": "Przypięci użytkownicy",

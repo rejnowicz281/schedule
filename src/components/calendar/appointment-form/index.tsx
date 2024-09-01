@@ -35,7 +35,7 @@ export default function CustomAppointmentForm({ readOnly }: { readOnly?: boolean
                 fourthLabel: t("Fourth"),
                 lastLabel: t("Last"),
                 yearsLabel: t("year(s)"),
-                ofLabel: t("of"),
+                ofLabel: `${t("of")} `,
                 everyLabel: t("Every"),
                 detailsLabel: t("Details")
             }}
