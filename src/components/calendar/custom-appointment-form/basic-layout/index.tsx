@@ -2,7 +2,7 @@ import { User } from "@/types/user";
 import { AppointmentForm } from "@devexpress/dx-react-scheduler-material-ui";
 import PinnedUsersSection from "./pinned-users-section";
 
-export default function CustomAppointmentForm({
+export default function CustomAppointmentFormBasicLayout({
     appointmentData,
     onFieldChange,
     readOnly,

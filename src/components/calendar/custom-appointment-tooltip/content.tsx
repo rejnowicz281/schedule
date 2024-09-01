@@ -8,10 +8,10 @@ export default function CustomAppointmentTooltipContent({
 }: AppointmentTooltip.ContentProps) {
     return (
         <AppointmentTooltip.Content {...restProps} appointmentData={appointmentData}>
-            <Box p={2}>
-                <div className="flex flex-wrap gap-2">
-                    {appointmentData?.pinnedUsers instanceof Array &&
-                        appointmentData.pinnedUsers.map((user: User) => (
+            <Box px={2}>
+                {appointmentData?.pinnedUsers instanceof Array && appointmentData.pinnedUsers.length > 0 && (
+                    <div className="flex flex-wrap gap-2 my-4">
+                        {appointmentData.pinnedUsers.map((user: User) => (
                             <Tooltip arrow title={user.displayName}>
                                 <Avatar
                                     sx={{ width: 35, height: 35 }}
@@ -23,9 +23,10 @@ export default function CustomAppointmentTooltipContent({
                                 </Avatar>
                             </Tooltip>
                         ))}
-                </div>
+                    </div>
+                )}
                 {appointmentData?.notes && (
-                    <Typography variant="body1" className="mt-5">
+                    <Typography variant="body1" className="my-4">
                         {appointmentData.notes}
                     </Typography>
                 )}
