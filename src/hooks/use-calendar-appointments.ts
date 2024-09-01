@@ -12,8 +12,9 @@ export default function useCalendarAppointments() {
     if (!user) return null;
 
     const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const [editingAppointment, setEditingAppointment] = useState<Partial<AppointmentModel> | undefined>(undefined);
     const [filters, setFilters] = useState<Set<string>>(new Set(["pinned", "created"]));
+
+    const [editingAppointment, setEditingAppointment] = useState<Partial<AppointmentModel> | undefined>(undefined);
 
     const onEditingAppointmentChange = (appointment: Partial<AppointmentModel>) => {
         setEditingAppointment(appointment);
@@ -21,6 +22,7 @@ export default function useCalendarAppointments() {
 
     useEffect(() => {
         const appointmentsCol = collection(db, "appointments");
+
         const q = query(
             appointmentsCol,
             or(
@@ -51,6 +53,7 @@ export default function useCalendarAppointments() {
 
     const onCommitChanges = async ({ added, changed, deleted }: ChangeSet) => {
         if (editingAppointment?.isReadOnly) return;
+
         const batch = writeBatch(db);
 
         setAppointments((prev) => {

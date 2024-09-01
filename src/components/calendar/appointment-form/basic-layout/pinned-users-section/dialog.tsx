@@ -61,7 +61,7 @@ export default function PinnedUsersDialog({ pinnedUsers, onPinnedUsersChange }: 
     return (
         <>
             <button
-                className="bg-inherit flex items-center justify-center border-gray-500 border cursor-pointer w-7 h-7 rounded-full"
+                className="bg-inherit flex items-center justify-center border-gray-500 border border-solid cursor-pointer w-7 h-7 rounded-full"
                 onClick={onOpen}
             >
                 <SwapVert className="w-4 h-4" />
