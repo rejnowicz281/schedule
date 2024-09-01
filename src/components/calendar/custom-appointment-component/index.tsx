@@ -4,7 +4,7 @@ export default function CustomAppointmentComponent({ children, data, ...restProp
     return (
         <Appointments.Appointment
             data={data}
-            className={data.isReadOnly && "bg-red-300 hover:bg-red-200"}
+            className={data.isReadOnly && "bg-sky-300 hover:bg-sky-400"}
             {...restProps}
         >
             {children}

@@ -13,6 +13,7 @@ export default function useCalendarAppointments() {
 
     const [appointments, setAppointments] = useState<Appointment[]>([]);
     const [editingAppointment, setEditingAppointment] = useState<Partial<AppointmentModel> | undefined>(undefined);
+    const [filters, setFilters] = useState<Set<string>>(new Set(["pinned", "created"]));
 
     const onEditingAppointmentChange = (appointment: Partial<AppointmentModel>) => {
         setEditingAppointment(appointment);
@@ -99,8 +100,20 @@ export default function useCalendarAppointments() {
         });
     };
 
+    const filteredAppointments = () => {
+        if (filters.has("pinned") && filters.has("created")) {
+            return appointments;
+        } else if (filters.has("pinned")) {
+            return appointments.filter((appointment) => appointment.userId !== user.uid);
+        } else if (filters.has("created")) {
+            return appointments.filter((appointment) => appointment.userId === user.uid);
+        }
+    };
+
     return {
-        appointments,
+        filters,
+        setFilters,
+        appointments: filteredAppointments(),
         onCommitChanges,
         editingAppointment,
         onEditingAppointmentChange

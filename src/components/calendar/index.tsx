@@ -21,16 +21,19 @@ import CustomAppointmentComponent from "./custom-appointment-component";
 import CustomAppointmentFormBasicLayout from "./custom-appointment-form/basic-layout";
 import CustomAppointmentTooltipContent from "./custom-appointment-tooltip/content";
 import CustomAppointmentTooltipHeader from "./custom-appointment-tooltip/header";
+import FilterSetter from "./filter-setter";
 
 export default function Calendar() {
     const calendarAppointments = useCalendarAppointments();
 
     if (!calendarAppointments) return null;
 
-    const { appointments, onCommitChanges, editingAppointment, onEditingAppointmentChange } = calendarAppointments;
+    const { appointments, onCommitChanges, editingAppointment, onEditingAppointmentChange, filters, setFilters } =
+        calendarAppointments;
 
     return (
         <Paper>
+            <FilterSetter filters={filters} setFilters={setFilters} />
             <Scheduler height={800} data={appointments}>
                 <ViewState />
                 <EditingState
@@ -55,7 +58,7 @@ export default function Calendar() {
                 <DragDropProvider
                     sourceAppointmentComponent={(props) => (
                         <DragDropProvider.SourceAppointment
-                            className={editingAppointment?.isReadOnly && "bg-pink-400"}
+                            className={editingAppointment?.isReadOnly && "bg-cyan-300"}
                             {...props}
                         />
                     )}
