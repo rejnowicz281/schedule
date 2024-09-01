@@ -2,8 +2,11 @@ import { auth, db, githubProvider } from "@/utils/firebase";
 import { Button } from "@mui/material";
 import { signInWithPopup } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useTranslation } from "react-i18next";
 
 export default function GithubLoginButton() {
+    const { t } = useTranslation();
+
     const handleGitHubLogin = async () => {
         try {
             const result = await signInWithPopup(auth, githubProvider);
@@ -25,7 +28,7 @@ export default function GithubLoginButton() {
 
     return (
         <Button variant="contained" onClick={handleGitHubLogin}>
-            Login with GitHub
+            {t("Login With Github")}
         </Button>
     );
 }

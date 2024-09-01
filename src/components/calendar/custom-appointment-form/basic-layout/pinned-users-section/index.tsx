@@ -1,6 +1,7 @@
 import { User } from "@/types/user";
 import { Avatar, Tooltip } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import { useTranslation } from "react-i18next";
 import PinnedUsersDialog from "./dialog";
 
 export type PinnedUsersProps = {
@@ -10,6 +11,8 @@ export type PinnedUsersProps = {
 };
 
 export default function PinnedUsersSection({ readOnly, pinnedUsers, onPinnedUsersChange }: PinnedUsersProps) {
+    const { t } = useTranslation();
+
     return (
         <div>
             <div className="flex gap-2 items-center">
@@ -21,7 +24,7 @@ export default function PinnedUsersSection({ readOnly, pinnedUsers, onPinnedUser
                         paddingTop: "16px"
                     }}
                 >
-                    Pinned Users
+                    {t("Pinned Users")}
                 </Typography>
                 {!readOnly && <PinnedUsersDialog pinnedUsers={pinnedUsers} onPinnedUsersChange={onPinnedUsersChange} />}
             </div>

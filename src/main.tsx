@@ -4,6 +4,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import "./utils/i18n.ts";
 
 const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement!);

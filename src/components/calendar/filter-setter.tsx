@@ -1,5 +1,6 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function FilterSetter({
     filters,
@@ -8,6 +9,8 @@ export default function FilterSetter({
     filters: Set<string>;
     setFilters: React.Dispatch<React.SetStateAction<Set<string>>>;
 }) {
+    const { t } = useTranslation();
+
     return (
         <div className="flex justify-start pl-6 pt-3">
             <FormControlLabel
@@ -23,7 +26,7 @@ export default function FilterSetter({
                         }
                     />
                 }
-                label="Created"
+                label={t("Created")}
             />
 
             <FormControlLabel
@@ -39,7 +42,7 @@ export default function FilterSetter({
                         }
                     />
                 }
-                label="Pinned"
+                label={t("Pinned")}
             />
         </div>
     );

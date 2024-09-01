@@ -15,10 +15,13 @@ import {
 } from "@mui/material";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PinnedUsersProps } from ".";
 
 export default function PinnedUsersDialog({ pinnedUsers, onPinnedUsersChange }: PinnedUsersProps) {
     const [open, setOpen] = useState(false);
+    const { t } = useTranslation();
+
     const [users, setUsers] = useState<User[]>([]);
 
     useEffect(() => {
@@ -64,7 +67,7 @@ export default function PinnedUsersDialog({ pinnedUsers, onPinnedUsersChange }: 
                 <SwapVert className="w-4 h-4" />
             </button>
             <Dialog onClose={onClose} open={open}>
-                <DialogTitle sx={{ pb: 0 }}>Pinned Users</DialogTitle>
+                <DialogTitle sx={{ pb: 0 }}>{t("Pinned Users")}</DialogTitle>
 
                 <List>
                     {users.map((user) => (
