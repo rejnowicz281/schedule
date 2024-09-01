@@ -6,8 +6,6 @@ i18next
     .use(initReactI18next)
     .use(LanguageDetector)
     .init({
-        // @ts-ignore
-        debug: process.env.NODE_ENV === "development",
         fallbackLng: "en",
         resources: {
             en: {

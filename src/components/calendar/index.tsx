@@ -37,7 +37,6 @@ export default function Calendar() {
     return (
         <div className="flex-1 relative overflow-y-hidden">
             <Paper className="absolute inset-0">
-                <FilterSetter filters={filters} setFilters={setFilters} />
                 <Scheduler firstDayOfWeek={1} locale={i18n.language} height="auto" data={appointments}>
                     <ViewState />
                     <EditingState
@@ -48,7 +47,14 @@ export default function Calendar() {
                     <WeekView name={t("week-view")} displayName={t("Week")} />
                     <DayView name={t("day-view")} displayName={t("Day")} />
                     <MonthView name={t("month-view")} displayName={t("Month")} />
-                    <Toolbar />
+                    <Toolbar
+                        rootComponent={(props) => <Toolbar.Root {...props} className="overflow-y-auto flex-wrap" />}
+                        flexibleSpaceComponent={(props) => (
+                            <Toolbar.FlexibleSpace {...props} className="flex-1 flex items-center pl-6">
+                                <FilterSetter filters={filters} setFilters={setFilters} />
+                            </Toolbar.FlexibleSpace>
+                        )}
+                    />
                     <DateNavigator />
                     <TodayButton
                         messages={{

@@ -12,7 +12,7 @@ export default function FilterSetter({
     const { t } = useTranslation();
 
     return (
-        <div className="flex justify-start pl-6 pt-3">
+        <div className="flex">
             <FormControlLabel
                 control={
                     <Checkbox

@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
+import SchedulerPage from "./pages/scheduler";
 import SettingsPage from "./pages/settings";
 import { AuthProvider, useAuth } from "./providers/auth-provider";
 
@@ -23,7 +23,7 @@ function Router() {
                 {user ? (
                     <>
                         <Route path="/*" element={<Navigate to="/" />} />
-                        <Route path="/" element={<HomePage />} />
+                        <Route path="/" element={<SchedulerPage />} />
                         <Route path="/settings" element={<SettingsPage />} />
                     </>
                 ) : (
