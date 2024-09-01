@@ -32,50 +32,52 @@ export default function Calendar() {
         calendarAppointments;
 
     return (
-        <Paper>
-            <FilterSetter filters={filters} setFilters={setFilters} />
-            <Scheduler height={800} data={appointments}>
-                <ViewState />
-                <EditingState
-                    editingAppointment={editingAppointment}
-                    onEditingAppointmentChange={onEditingAppointmentChange}
-                    onCommitChanges={onCommitChanges}
-                />
-                <WeekView />
-                <DayView />
-                <MonthView />
-                <Toolbar />
-                <DateNavigator />
-                <TodayButton />
-                <ViewSwitcher />
-                <AllDayPanel />
-                <EditRecurrenceMenu
-                    layoutComponent={(props) =>
-                        editingAppointment?.isReadOnly ? null : <EditRecurrenceMenu.Layout {...props} />
-                    }
-                />
-                <Appointments appointmentComponent={CustomAppointmentComponent} />
-                <DragDropProvider
-                    sourceAppointmentComponent={(props) => (
-                        <DragDropProvider.SourceAppointment
-                            className={editingAppointment?.isReadOnly && "bg-cyan-300"}
-                            {...props}
-                        />
-                    )}
-                    containerComponent={(props) =>
-                        editingAppointment?.isReadOnly ? null : <DragDropProvider.Container {...props} />
-                    }
-                />
-                <AppointmentTooltip
-                    contentComponent={CustomAppointmentTooltipContent}
-                    headerComponent={CustomAppointmentTooltipHeader}
-                    showCloseButton
-                />
-                <AppointmentForm
-                    readOnly={editingAppointment?.isReadOnly}
-                    basicLayoutComponent={CustomAppointmentFormBasicLayout}
-                />
-            </Scheduler>
-        </Paper>
+        <div className="relative bg-red-300 flex-1 overflow-y-hidden">
+            <Paper className="absolute inset-0">
+                <FilterSetter filters={filters} setFilters={setFilters} />
+                <Scheduler height="auto" data={appointments}>
+                    <ViewState />
+                    <EditingState
+                        editingAppointment={editingAppointment}
+                        onEditingAppointmentChange={onEditingAppointmentChange}
+                        onCommitChanges={onCommitChanges}
+                    />
+                    <WeekView />
+                    <DayView />
+                    <MonthView />
+                    <Toolbar />
+                    <DateNavigator />
+                    <TodayButton />
+                    <ViewSwitcher />
+                    <AllDayPanel />
+                    <EditRecurrenceMenu
+                        layoutComponent={(props) =>
+                            editingAppointment?.isReadOnly ? null : <EditRecurrenceMenu.Layout {...props} />
+                        }
+                    />
+                    <Appointments appointmentComponent={CustomAppointmentComponent} />
+                    <DragDropProvider
+                        sourceAppointmentComponent={(props) => (
+                            <DragDropProvider.SourceAppointment
+                                className={editingAppointment?.isReadOnly && "bg-cyan-300"}
+                                {...props}
+                            />
+                        )}
+                        containerComponent={(props) =>
+                            editingAppointment?.isReadOnly ? null : <DragDropProvider.Container {...props} />
+                        }
+                    />
+                    <AppointmentTooltip
+                        contentComponent={CustomAppointmentTooltipContent}
+                        headerComponent={CustomAppointmentTooltipHeader}
+                        showCloseButton
+                    />
+                    <AppointmentForm
+                        readOnly={editingAppointment?.isReadOnly}
+                        basicLayoutComponent={CustomAppointmentFormBasicLayout}
+                    />
+                </Scheduler>
+            </Paper>
+        </div>
     );
 }

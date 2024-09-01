@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
+import SettingsPage from "./pages/settings";
 import { AuthProvider, useAuth } from "./providers/auth-provider";
 
 export default function App() {
@@ -23,6 +24,7 @@ function Router() {
                     <>
                         <Route path="/*" element={<Navigate to="/" />} />
                         <Route path="/" element={<HomePage />} />
+                        <Route path="/settings" element={<SettingsPage />} />
                     </>
                 ) : (
                     <>

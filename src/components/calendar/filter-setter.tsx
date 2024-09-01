@@ -9,7 +9,7 @@ export default function FilterSetter({
     setFilters: React.Dispatch<React.SetStateAction<Set<string>>>;
 }) {
     return (
-        <div className="flex justify-end pr-6 pt-3">
+        <div className="flex justify-start pl-6 pt-3">
             <FormControlLabel
                 control={
                     <Checkbox
